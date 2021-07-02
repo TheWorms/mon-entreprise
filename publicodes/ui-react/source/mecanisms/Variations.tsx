@@ -39,7 +39,7 @@ export default function Variations({
 											: 0.8,
 								}}
 							>
-								{!satisfied && nodeValue != null && (
+								{!satisfied && (
 									<>
 										<em>non applicable </em>
 										{expandedVariation !== i ? (
@@ -59,9 +59,7 @@ export default function Variations({
 										)}
 									</>
 								)}
-								{(expandedVariation === i ||
-									satisfied ||
-									nodeValue == null) && (
+								{(expandedVariation === i || satisfied) && (
 									<div style={{ margin: '1rem 0' }}>
 										{!condition.isDefault && (
 											<div
