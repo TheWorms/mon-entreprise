@@ -4017,21 +4017,6 @@ contrat salarié . maladie . taux salarié:
 contrat salarié . maladie . taux solidarité autonomie:
   titre.en: '[automatic] solidarity rate autonomy'
   titre.fr: taux solidarité autonomie
-contrat salarié . médecine du travail:
-  description.en: >-
-    The employer has the obligation to organize an occupational health service,
-    by joining a service for businesses, or by creating an internal service.
-
-
-    In the case of joining a service, the amount of this contribution is not defined by the law, but it must be proportional to the number of employees. We have chosen an indicative amount (see references) adjusted with inflation since 2007.
-  description.fr: >
-    L'employeur a l'obligation d'organiser un service de santé au travail, en
-    adhérant à un service interentreprises, ou en créant un service interne.
-
-
-    Dans le cas de l'adhésion à un service, le montant de cette cotisation n'est pas défini par la loi, mais il doit être proportionnel au nombre d'employés. Nous avons choisi un montant indicatif (voir les références) ajusté avec l'inflation depuis 2007.
-  titre.en: Occupational Medicine
-  titre.fr: médecine du travail
 contrat salarié . participation effort de construction:
   description.en: Employer participation in the home building effort
   description.fr: Participation des employeurs à l'effort de construction

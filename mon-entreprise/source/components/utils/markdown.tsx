@@ -106,6 +106,7 @@ export const Markdown = ({
 			link: LinkRenderer,
 			text: TextRenderer,
 			code: CodeBlock,
+			emphasis: ({ children }) => <small>{children}</small>,
 			...renderers,
 		}}
 		{...otherProps}

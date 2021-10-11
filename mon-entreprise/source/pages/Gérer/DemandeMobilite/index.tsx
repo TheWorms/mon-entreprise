@@ -21,100 +21,52 @@ import {
 import { TrackPage } from '../../../ATInternetTracking'
 import { hash } from '../../../utils'
 import formulaire from './demande-mobilité.yaml'
+import picture from './undraw_Traveling_re_weve.svg'
 
 const LazyEndBlock = lazy(() => import('./EndBlock'))
 
-export default function FormulaireMobilitéIndépendant() {
+export default function PageMobilité() {
 	const engine = new Engine(formulaire)
+
 	return (
-		<EngineProvider value={engine}>
+		<>
 			<PageHeader
-				titre={
-					'Demande de mobilité internationale pour travailleur indépendant'
-				}
+				titre={'Demande de mobilité internationale'}
+				picture={picture}
 			>
 				<p className="ui__ lead">
-					Travailleur indépendant exerçant son activité à l’étranger : Régime de
-					Sécurité sociale applicable{' '}
+					Vous êtes travailleur indépendant ou auto-entrepreneur et souhaitez
+					travailler à l'étranger ? Vous trouverez ici toutes les informations
+					pour remplir une demande de certificat A1 afin d'être couverts pendant
+					votre déplacement.
 				</p>
 			</PageHeader>
-			<p>
-				Vous exercez une activité non salariée ou salariée dans un ou plusieurs
-				Etats (pays) membres de l’UE, de l’
-				<abbr title="Espace Économique Européen">EEE</abbr>*, en Suisse ou dans
-				un pays lié à la France par convention bilatérale. A ce titre, vous
-				devez <strong>compléter ce formulaire</strong> pour définir votre régime
-				de Sécurité sociale applicable durant cette période et l’envoyer par
-				email à{' '}
-				<a href="mailto:mobilite-internationale@urssaf.fr">
-					mobilite-internationale@urssaf.fr
-				</a>
-				.
-			</p>
-			<p>
-				Après étude de votre demande, si les conditions le permettent, vous
-				recevrez un certificat A1 (ou le formulaire spécifique) attestant du
-				maintien à la Sécurité sociale française.
-			</p>
-
-			<p>
-				<small>
-					* Pays concernés : Allemagne, Autriche, Belgique, Bulgarie, Chypre,
-					Croatie, Danemark, Espagne, Estonie, Finlande, Grèce, Hongrie,
-					Irlande, Islande, Italie, Lettonie, Liechtenstein, Lituanie,
-					Luxembourg, Malte, Norvège, Pays-Bas, Pologne, Portugal, République
-					Tchèque, Roumanie, Royaume-Uni, Slovaquie, Slovénie, Suède, Suisse
-				</small>
-			</p>
-
-			<blockquote>
-				<p className="ui__ lead">
-					<strong>
-						Attention : ce document doit être signé <Emoji emoji="✍️" />
-					</strong>
-				</p>
-				<p>
-					Aussi, nous vous invitons à utiliser un écran tactile pour le
-					compléter (téléphone, tablette, etc.). Sinon, vous devrez l’imprimer,
-					le signer et le scanner avant envoi par mail.
-				</p>
-			</blockquote>
-			<p className="ui__ notice">
-				En cas de difficultés pour{' '}
-				<strong>remplir ce formulaire, contactez un conseiller</strong> par
-				email{' '}
-				<a href="mailto:mobilite-internationale@urssaf.fr">
-					mobilite-internationale@urssaf.fr
-				</a>{' '}
-				ou par téléphone au{' '}
-				<strong>
-					<a href="tel:+33806804213">+33(0) 806 804 213</a>
-				</strong>{' '}
-				de 9h00 à 12h00 et de 13h00 à 16h00 (service gratuit + prix appel).
-			</p>
-			<FormulairePublicodes />
-		</EngineProvider>
+			<EngineProvider value={engine}>
+				<FormulairePublicodes />
+			</EngineProvider>
+		</>
 	)
 }
 
 const useFields = (
-	engine: Engine<string>,
-	fieldNames: Array<string>
+	engine: Engine<string>
 ): Array<ReturnType<Engine['getRule']>> => {
-	return fieldNames
+	return Object.keys(engine.getParsedRules())
 		.filter((dottedName) => {
-			const isNotApplicable = UNSAFE_isNotApplicable(engine, dottedName)
 			const evaluation = engine.evaluate(dottedName)
 			const rule = engine.getRule(dottedName)
-			return (
-				isNotApplicable === false &&
-				(equals(evaluation.missingVariables, { [dottedName]: 1 }) ||
-					isEmpty(evaluation.missingVariables)) &&
-				(rule.rawNode.question ||
-					rule.rawNode.API ||
-					rule.rawNode.type ||
-					rule.rawNode.description)
-			)
+			const isNotApplicable = UNSAFE_isNotApplicable(engine, dottedName)
+			const displayRule =
+				(isNotApplicable === false &&
+					(equals(evaluation.missingVariables, { [dottedName]: 1 }) ||
+						isEmpty(evaluation.missingVariables)) &&
+					(rule.rawNode.question || rule.rawNode.API || rule.rawNode.type)) ||
+				(isNotApplicable === false &&
+					rule.rawNode.type === 'groupe' &&
+					Object.keys(evaluation.missingVariables).every((childDottedName) =>
+						childDottedName.startsWith(dottedName)
+					))
+			return displayRule
 		})
 		.map((dottedName) => engine.getRule(dottedName))
 }
@@ -126,6 +78,7 @@ function FormulairePublicodes() {
 		`formulaire-détachement:${VERSION}`,
 		{}
 	)
+	console.log(situation)
 	const onChange = useCallback(
 		(dottedName, value) => {
 			if (value === undefined) {
@@ -148,7 +101,7 @@ function FormulairePublicodes() {
 	}, [clearFieldsKey, setSituation])
 
 	engine.setSituation(situation)
-	const fields = useFields(engine, Object.keys(formulaire))
+	const fields = useFields(engine)
 
 	const isMissingValues = fields.some(
 		({ dottedName }) => !isEmpty(engine.evaluate(dottedName).missingVariables)
@@ -187,7 +140,7 @@ function FormulairePublicodes() {
 												margin-top: 0.6rem;
 											`}
 										>
-											{question}
+											<Markdown source={question} />
 										</span>
 									) : (
 										<small>{title}</small>
@@ -209,10 +162,12 @@ function FormulairePublicodes() {
 					</FromTop>
 				)
 			)}
+			<Condition expression="DLA">
+				<Suspense fallback={null}>
+					<LazyEndBlock fields={fields} isMissingValues={isMissingValues} />
+				</Suspense>
+			</Condition>
 
-			<Suspense fallback={null}>
-				<LazyEndBlock fields={fields} isMissingValues={isMissingValues} />
-			</Suspense>
 			{!!Object.keys(situation).length && (
 				<div
 					css={`

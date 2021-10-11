@@ -92,6 +92,10 @@ export default function parseRule(
 	const ruleContext = { ...context, dottedName, ruleTitle }
 
 	const [parent] = ruleParents(dottedName)
+
+	// This step ensure that the order of the parsedRules object follows the order of rule definition in yaml
+	context.parsedRules[dottedName] = {} as RuleNode
+
 	const explanation = {
 		valeur: parse(ruleValue, ruleContext),
 		parent: !!parent && parse(parent, context),
@@ -167,7 +171,6 @@ registerEvaluationFunction('rule', function evaluate(node) {
 
 		explanation.valeur = valeur
 	}
-
 	const evaluation = {
 		...node,
 		explanation,
@@ -177,6 +180,12 @@ registerEvaluationFunction('rule', function evaluate(node) {
 			bonus(parent?.missingVariables)
 		),
 		...(valeur && 'unit' in valeur && { unit: valeur.unit }),
+	}
+	if (
+		node.dottedName ===
+		'activité transfrontalière simultanée . activité salariée . pays . convention bilatérale . informations personnelles . statut marital'
+	) {
+		console.log(evaluation)
 	}
 
 	return evaluation
